@@ -24,7 +24,6 @@ class Updater(commands.Cog):
             return json.load(f)
 
     async def get_updates(self):
-
         channel = self.client.get_channel(996599085521977414)
 
         mods = self.load_from('mods')
