@@ -1,12 +1,16 @@
-from turtle import update
-from webbrowser import get
+from zipfile import ZipFile
+import os
 import discord
 import json
 import requests
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.ext.commands.core import Command
 
 class Updater(commands.Cog):
+
+    def cog_unload(self):
+        if self.fetch_updates_task.is_running():
+            self.fetch_updates_task.stop()
 
     def __init__(self, client):
         self.client = client
@@ -20,46 +24,60 @@ class Updater(commands.Cog):
         with open(f"{file}.json", "r") as f:
             return json.load(f)
 
-    async def get_updates(self, ctx):
+    async def get_updates(self):
+
+        channel = self.client.get_channel(996599085521977414)
 
         mods = self.load_from('mods')
         update = False
 
         for project_slug in mods:
             url = f'https://api.modrinth.com/v2/project/{project_slug}/version'
+            project_url = f'https://api.modrinth.com/v2/project/{project_slug}'
 
             data = requests.get(url).json
+            project_data = requests.get(project_url).json
 
             for latest_version in data():
                 
                 latest_versions = self.load_from('latest_versions')
 
-                if latest_version in latest_versions:
+                if latest_version["version_number"] in latest_versions:
                     break
 
                 if latest_version["version_type"] == "release":
-                    title = latest_version["name"]
-                    changelog = latest_version["changelog"]
-                    download = latest_version['files'][0]['url']
-                    game_version = latest_version["game_versions"]
-                    loaders = latest_version["loaders"]
+                    
+                    if len(latest_version["game_versions"]) == 1:
+                        mc_versions = latest_version["game_versions"][0]
+                    else:
+                        mc_versions = "".join(f"{x}  " for x in latest_version["game_versions"])
+
+                    if len(latest_version["loaders"]) == 1:
+                        loaders = latest_version["loaders"][0].capitalize()
+                    else:
+                        loaders = "".join(f"{x.capitalize()} " for x in latest_version["loaders"])
 
                     update = True
-                    await ctx.send(f"{title} a reçu une mise à jour !")
-                    # await ctx.send(changelog)
-                    # await ctx.send(download)
-                    # await ctx.send(loaders, game_version)
+                    embed=discord.Embed(title=project_data()["title"], url=latest_version['files'][0]['url'], color=0x1bd96a)
+                    embed.set_thumbnail(url=project_data()["icon_url"])
+                    embed.add_field(name="Version", value=latest_version['name'], inline=True)
+                    embed.add_field(name="Versions Minecraft", value=mc_versions, inline=True)
+                    embed.add_field(name="Mod Loaders", value=loaders, inline=False)
+                    embed.set_footer(text=latest_version["changelog"][:300] + "...")
+                    await channel.send(embed=embed)
 
-                    latest_versions.append(latest_version)
+                    latest_versions.append(latest_version['version_number'])
                     self.write_in('latest_versions', latest_versions)
 
                     break
-        
+
         if not update:
             await ctx.send("Aucun mod n'a reçu de mise à jour !")
 
     async def prepare_method(self):
         await self.client.wait_until_ready()
+
+        self.fetch_updates_task = self.fetch_updates.start()
 
     @commands.is_owner()
     @commands.command()
@@ -129,6 +147,56 @@ class Updater(commands.Cog):
 
         await ctx.reply(msg, mention_author=False)
 
+    @commands.is_owner()
+    @commands.command()
+    async def dlmodpack(self, ctx, version="1.19"):
+        msg = await ctx.reply("Génération du Modpack en cours : Démarrage...", mention_author=False)
+        mods = self.load_from('mods')
+
         
+        index = 0
+        for project_slug in mods:
+            url = f'https://api.modrinth.com/v2/project/{project_slug}/version'
+
+            data = requests.get(url).json
+
+            index += 1
+            for latest_version in data():
+
+                if latest_version["version_type"] == "release" and version in latest_version["game_versions"]:
+                    download = latest_version['files'][0]['url']
+                    file_name = latest_version['files'][0]['filename']
+
+                    file = requests.get(download)
+                    open(f'mods/{file_name}', 'wb').write(file.content)
+
+                    await msg.edit(f"Génération du Modpack en cours : Téléchargement des mods ({index}/{len(mods)})")
+
+                    break
+        
+        ModPack = ZipFile(f'modpack-oery-{version}.zip', 'w')
+
+        index = 0
+        for mod in os.listdir('mods'):
+            index += 1
+            ModPack.write(f'mods/{mod}')
+            os.remove(f'mods/{mod}')
+
+            if index % 20 == 0:
+                await msg.edit(f"Génération du Modpack en cours : Compression des mods ({index}/{len(mods)})")
+
+        await ctx.reply("Terminé !", mention_author=True, file=discord.File(f'modpack-oery-{version}.zip'))
+        ModPack.close()
+
+    @tasks.loop(hours=1)
+    async def fetch_updates(self):
+        await self.get_updates()
+
+    @fetch_updates.before_loop
+    async def before_fetch_updates(self):
+        await self.client.wait_until_ready()
+
+
 def setup(self):
     self.add_cog(Updater(self))
+
