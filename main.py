@@ -1,7 +1,11 @@
 import discord
 import os
+from dotenv import load_dotenv
 from discord.ext import commands
 from discord_components import *
+
+load_dotenv('.env')
+TOKEN = os.getenv('TOKEN')
 
 intents = discord.Intents.default()
 intents.members = True
@@ -33,4 +37,4 @@ for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         client.load_extension(f'cogs.{filename[:-3]}')
 
-client.run('OTk2NTk2MDc1MzQ1NDk0MDI4.G2TKRc.O4jSnJJxnltoElMCQgtTb3WLIFG38Ue7LvSgAo')
+client.run(TOKEN)
