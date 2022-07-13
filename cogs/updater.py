@@ -55,7 +55,6 @@ class Updater(commands.Cog):
                     else:
                         loaders = "".join(f"{x.capitalize()} " for x in latest_version["loaders"])
 
-                    update = True
                     embed=discord.Embed(title=project_data()["title"], url=latest_version['files'][0]['url'], color=0x1bd96a)
                     embed.set_thumbnail(url=project_data()["icon_url"])
                     embed.add_field(name="Version", value=latest_version['name'], inline=True)
@@ -68,6 +67,7 @@ class Updater(commands.Cog):
                     self.write_in('latest_versions', latest_versions)
 
                     break
+
 
     async def prepare_method(self):
         await self.client.wait_until_ready()
@@ -142,13 +142,13 @@ class Updater(commands.Cog):
 
         await ctx.reply(msg, mention_author=False)
 
+
     @commands.is_owner()
     @commands.command()
     async def dlmodpack(self, ctx, version="1.19"):
         msg = await ctx.reply("Génération du Modpack en cours : Démarrage...", mention_author=False)
         mods = self.load_from('mods')
 
-        
         index = 0
         for project_slug in mods:
             url = f'https://api.modrinth.com/v2/project/{project_slug}/version'
@@ -183,9 +183,11 @@ class Updater(commands.Cog):
         await ctx.reply("Terminé !", mention_author=True, file=discord.File(f'modpack-oery-{version}.zip'))
         ModPack.close()
 
+
     @tasks.loop(hours=1)
     async def fetch_updates(self):
         await self.get_updates()
+
 
     @fetch_updates.before_loop
     async def before_fetch_updates(self):
