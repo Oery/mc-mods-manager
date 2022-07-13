@@ -4,7 +4,6 @@ import discord
 import json
 import requests
 from discord.ext import commands, tasks
-from discord.ext.commands.core import Command
 
 class Updater(commands.Cog):
 
