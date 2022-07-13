@@ -29,7 +29,6 @@ class Updater(commands.Cog):
         channel = self.client.get_channel(996599085521977414)
 
         mods = self.load_from('mods')
-        update = False
 
         for project_slug in mods:
             url = f'https://api.modrinth.com/v2/project/{project_slug}/version'
@@ -70,9 +69,6 @@ class Updater(commands.Cog):
                     self.write_in('latest_versions', latest_versions)
 
                     break
-
-        if not update:
-            await ctx.send("Aucun mod n'a reçu de mise à jour !")
 
     async def prepare_method(self):
         await self.client.wait_until_ready()
