@@ -5,6 +5,7 @@ import discord
 import json
 import requests
 import asyncio
+import datetime
 from discord.ext import commands, tasks
 
 class Updater(commands.Cog):
@@ -25,6 +26,9 @@ class Updater(commands.Cog):
         with open(f"{file}.json", "r") as f:
             return json.load(f)
 
+    def log(self, category, msg):
+        print(datetime.datetime.now().strftime("%H:%M:%S"), f'[{category.upper()}] : {msg}')
+
     async def get_updates(self):
         channel = self.client.get_channel(996599085521977414)
 
@@ -33,13 +37,15 @@ class Updater(commands.Cog):
         for project_slug in mods:
             
             try:
-                print('fetching updates for', project_slug)
+
+                self.log('info', f'Fetching updates for {project_slug}')
 
                 await asyncio.sleep(1)
                 url = f'https://api.modrinth.com/v2/project/{project_slug}/version'
                 project_url = f'https://api.modrinth.com/v2/project/{project_slug}'
                 
                 data = requests.get(url).json
+                self.log('info', f'Fetched versions data for {project_slug}')
                 await asyncio.sleep(2)
                 
                 for latest_version in data():
@@ -49,7 +55,10 @@ class Updater(commands.Cog):
                     if project_slug in latest_versions:
                         
                         if latest_version["version_number"] == latest_versions[project_slug]:
+                            self.log('info', f'No new update for {project_slug}')
                             break
+                    
+                    self.log('info', f'New version detected for {project_slug}')
 
                     if latest_version["version_type"] == "release":
                         
@@ -64,7 +73,8 @@ class Updater(commands.Cog):
                             loaders = "".join(f"{x.capitalize()} " for x in latest_version["loaders"])
 
                         project_data = requests.get(project_url).json
-                        
+                        self.log('info', f'Fetched project data for {project_slug}')
+
                         embed=discord.Embed(title=project_data()["title"], url=latest_version['files'][0]['url'], color=0x1bd96a)
                         embed.set_thumbnail(url=project_data()["icon_url"])
                         embed.add_field(name="Version", value=latest_version['name'], inline=True)
@@ -73,6 +83,7 @@ class Updater(commands.Cog):
                         embed.set_footer(text=latest_version["changelog"][:300] + "...")
                         await channel.send(embed=embed)
 
+                        self.log('info', f'New update for {project_slug}')
                         latest_versions[project_slug] = latest_version['version_number']
                         self.write_in('latest_versions', latest_versions)
 
@@ -157,17 +168,21 @@ class Updater(commands.Cog):
             'query': mod,
         }
 
-        res = requests.get(url, params=params)
+        res = requests.get(url, params=params).json()
 
-        slug = res.json()['hits'][0]['slug']
-        title = res.json()['hits'][0]['title']
-        icon_url = res.json()['hits'][0]['icon_url']
+        if len(res['hits']) == 0:
+            await ctx.reply('Aucun mod trouvé avec ces paramètres.', mention_author=False)
+            return
+
+        slug = res['hits'][0]['slug']
+        title = res['hits'][0]['title']
+        icon_url = res['hits'][0]['icon_url']
 
         url = f'https://api.modrinth.com/v2/project/{slug}/version'
 
         res = requests.get(url)
 
-        for release in res.json():
+        for release in res:
 
             if version and version not in release['game_versions']:
                 continue
