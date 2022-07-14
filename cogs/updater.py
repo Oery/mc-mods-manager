@@ -48,7 +48,7 @@ class Updater(commands.Cog):
                     
                     latest_versions = self.load_from('latest_versions')
 
-                    if latest_version["version_number"] in latest_versions:
+                    if latest_version["version_number"] == latest_versions[project_slug]:
                         break
 
                     if latest_version["version_type"] == "release":
@@ -71,7 +71,7 @@ class Updater(commands.Cog):
                         embed.set_footer(text=latest_version["changelog"][:300] + "...")
                         await channel.send(embed=embed)
 
-                        latest_versions.append(latest_version['version_number'])
+                        latest_versions[project_slug] = latest_version['version_number']
                         self.write_in('latest_versions', latest_versions)
 
                         break
