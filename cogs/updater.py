@@ -1,8 +1,10 @@
+from threading import Thread
 from zipfile import ZipFile
 import os
 import discord
 import json
 import requests
+import asyncio
 from discord.ext import commands, tasks
 
 class Updater(commands.Cog):
@@ -29,43 +31,53 @@ class Updater(commands.Cog):
         mods = self.load_from('mods')
 
         for project_slug in mods:
-            url = f'https://api.modrinth.com/v2/project/{project_slug}/version'
-            project_url = f'https://api.modrinth.com/v2/project/{project_slug}'
+            
+            try:
+                print('fetching updates for', project_slug)
 
-            data = requests.get(url).json
-            project_data = requests.get(project_url).json
-
-            for latest_version in data():
+                await asyncio.sleep(1)
+                url = f'https://api.modrinth.com/v2/project/{project_slug}/version'
+                project_url = f'https://api.modrinth.com/v2/project/{project_slug}'
                 
-                latest_versions = self.load_from('latest_versions')
+                data = requests.get(url).json
+                await asyncio.sleep(2)
+                
+                project_data = requests.get(project_url).json
 
-                if latest_version["version_number"] in latest_versions:
-                    break
-
-                if latest_version["version_type"] == "release":
+                for latest_version in data():
                     
-                    if len(latest_version["game_versions"]) == 1:
-                        mc_versions = latest_version["game_versions"][0]
-                    else:
-                        mc_versions = "".join(f"{x}  " for x in latest_version["game_versions"])
+                    latest_versions = self.load_from('latest_versions')
 
-                    if len(latest_version["loaders"]) == 1:
-                        loaders = latest_version["loaders"][0].capitalize()
-                    else:
-                        loaders = "".join(f"{x.capitalize()} " for x in latest_version["loaders"])
+                    if latest_version["version_number"] in latest_versions:
+                        break
 
-                    embed=discord.Embed(title=project_data()["title"], url=latest_version['files'][0]['url'], color=0x1bd96a)
-                    embed.set_thumbnail(url=project_data()["icon_url"])
-                    embed.add_field(name="Version", value=latest_version['name'], inline=True)
-                    embed.add_field(name="Versions Minecraft", value=mc_versions, inline=True)
-                    embed.add_field(name="Mod Loaders", value=loaders, inline=False)
-                    embed.set_footer(text=latest_version["changelog"][:300] + "...")
-                    await channel.send(embed=embed)
+                    if latest_version["version_type"] == "release":
+                        
+                        if len(latest_version["game_versions"]) == 1:
+                            mc_versions = latest_version["game_versions"][0]
+                        else:
+                            mc_versions = "".join(f"{x}  " for x in latest_version["game_versions"])
 
-                    latest_versions.append(latest_version['version_number'])
-                    self.write_in('latest_versions', latest_versions)
+                        if len(latest_version["loaders"]) == 1:
+                            loaders = latest_version["loaders"][0].capitalize()
+                        else:
+                            loaders = "".join(f"{x.capitalize()} " for x in latest_version["loaders"])
 
-                    break
+                        embed=discord.Embed(title=project_data()["title"], url=latest_version['files'][0]['url'], color=0x1bd96a)
+                        embed.set_thumbnail(url=project_data()["icon_url"])
+                        embed.add_field(name="Version", value=latest_version['name'], inline=True)
+                        embed.add_field(name="Versions Minecraft", value=mc_versions, inline=True)
+                        embed.add_field(name="Mod Loaders", value=loaders, inline=False)
+                        embed.set_footer(text=latest_version["changelog"][:300] + "...")
+                        await channel.send(embed=embed)
+
+                        latest_versions.append(latest_version['version_number'])
+                        self.write_in('latest_versions', latest_versions)
+
+                        break
+
+            except Exception:
+                print('failed to fetch updates for', project_slug)
 
 
     async def prepare_method(self):
@@ -128,6 +140,58 @@ class Updater(commands.Cog):
         await ctx.reply("Fetching Updates !", mention_author=False)
         await self.get_updates(ctx)
     
+    @commands.command()
+    async def mod(self, ctx, mod, version="", loader=""):
+
+        if version == "":
+            version = False
+
+        if loader == "":
+            loader = False
+        
+        url = 'https://api.modrinth.com/v2/search'
+
+        params = {
+            'query': mod,
+        }
+
+        res = requests.get(url, params=params)
+
+        slug = res.json()['hits'][0]['slug']
+        title = res.json()['hits'][0]['title']
+        icon_url = res.json()['hits'][0]['icon_url']
+
+        url = f'https://api.modrinth.com/v2/project/{slug}/version'
+
+        res = requests.get(url)
+
+        for release in res.json():
+
+            if version and version not in release['game_versions']:
+                continue
+
+            if loader and loader not in release['loaders']:
+                continue
+
+            break
+        
+        if len(release["game_versions"]) == 1:
+            mc_versions = release["game_versions"][0]
+        else:
+            mc_versions = "".join(f"{x}  " for x in release["game_versions"])
+
+        if len(release["loaders"]) == 1:
+            loaders = release["loaders"][0].capitalize()
+        else:
+            loaders = "".join(f"{x.capitalize()} " for x in release["loaders"])
+
+        embed=discord.Embed(title=title, url=release['files'][0]['url'], color=0x1bd96a)
+        embed.set_thumbnail(url=icon_url)
+        embed.add_field(name="Version", value=release['name'], inline=True)
+        embed.add_field(name="Versions Minecraft", value=mc_versions, inline=True)
+        embed.add_field(name="Mod Loaders", value=loaders, inline=False)
+        embed.set_footer(text=release["changelog"][:300] + "...")
+        await ctx.reply(embed=embed, mention_author=False)
 
     @commands.is_owner()
     @commands.command()
@@ -167,7 +231,8 @@ class Updater(commands.Cog):
                     await msg.edit(f"Génération du Modpack en cours : Téléchargement des mods ({index}/{len(mods)})")
 
                     break
-        
+            
+            
         ModPack = ZipFile(f'modpack-oery-{version}.zip', 'w')
 
         index = 0
