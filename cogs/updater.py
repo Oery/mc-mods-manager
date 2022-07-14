@@ -42,8 +42,6 @@ class Updater(commands.Cog):
                 data = requests.get(url).json
                 await asyncio.sleep(2)
                 
-                project_data = requests.get(project_url).json
-
                 for latest_version in data():
                     
                     latest_versions = self.load_from('latest_versions')
@@ -65,6 +63,8 @@ class Updater(commands.Cog):
                         else:
                             loaders = "".join(f"{x.capitalize()} " for x in latest_version["loaders"])
 
+                        project_data = requests.get(project_url).json
+                        
                         embed=discord.Embed(title=project_data()["title"], url=latest_version['files'][0]['url'], color=0x1bd96a)
                         embed.set_thumbnail(url=project_data()["icon_url"])
                         embed.add_field(name="Version", value=latest_version['name'], inline=True)
