@@ -58,10 +58,9 @@ class Updater(commands.Cog):
                             self.log('info', f'No new update for {project_slug}')
                             break
                     
-                    self.log('info', f'New version detected for {project_slug}')
-
                     if latest_version["version_type"] == "release":
-                        
+                        self.log('info', f'New version detected for {project_slug}')
+
                         if len(latest_version["game_versions"]) == 1:
                             mc_versions = latest_version["game_versions"][0]
                         else:
