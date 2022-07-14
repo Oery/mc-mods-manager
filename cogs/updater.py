@@ -48,8 +48,10 @@ class Updater(commands.Cog):
                     
                     latest_versions = self.load_from('latest_versions')
 
-                    if latest_version["version_number"] == latest_versions[project_slug]:
-                        break
+                    if project_slug in latest_versions:
+                        
+                        if latest_version["version_number"] == latest_versions[project_slug]:
+                            break
 
                     if latest_version["version_type"] == "release":
                         
