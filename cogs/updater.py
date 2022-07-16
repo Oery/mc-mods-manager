@@ -254,7 +254,7 @@ class Updater(commands.Cog):
         index = 0
         for mod in os.listdir('mods'):
             index += 1
-            ModPack.write(f'mods/{mod}')
+            ModPack.write(f'mods/{mod}', arcname=mod)
             os.remove(f'mods/{mod}')
 
             if index % 20 == 0:
