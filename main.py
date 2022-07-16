@@ -16,19 +16,19 @@ client.remove_command('help')
 
 @client.command(pass_context=True)
 @commands.is_owner()
-async def load(ctx, extension):
+async def mdmload(ctx, extension):
     client.load_extension(f'cogs.{extension}')
     await ctx.send(f"Loaded {extension}.py successfully")
 
 @client.command(pass_context=True)
 @commands.is_owner()
-async def unload(ctx, extension):
+async def mdmunload(ctx, extension):
     client.unload_extension(f'cogs.{extension}')
     await ctx.send(f"Unloaded {extension}.py successfully")
 
 @client.command(pass_context=True)
 @commands.is_owner()
-async def reload(ctx, extension):
+async def mdmreload(ctx, extension):
     client.unload_extension(f'cogs.{extension}')
     client.load_extension(f'cogs.{extension}')
     await ctx.send(f"Reloaded {extension}.py successfully")
