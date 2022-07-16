@@ -20,7 +20,7 @@ class Updater(commands.Cog):
 
     def write_in(self, file, data):
         with open(f"{file}.json", "w") as f:
-            json.dump(data, f)
+            json.dump(data, f, indent=4)
 
     def load_from(self, file):
         with open(f"{file}.json", "r") as f:
@@ -179,7 +179,7 @@ class Updater(commands.Cog):
 
         url = f'https://api.modrinth.com/v2/project/{slug}/version'
 
-        res = requests.get(url)
+        res = requests.get(url).json()
 
         for release in res:
 
