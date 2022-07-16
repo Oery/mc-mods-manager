@@ -155,3 +155,4 @@ mods/
 index.json
 modpacks.json
 mods.json
+indexer.py
