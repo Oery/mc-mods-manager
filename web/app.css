@@ -1,0 +1,234 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+body {
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    background-color: #1a1a1a;
+    margin: 0;
+    
+    font-family: 'Inter';
+    font-size: 16px;
+    font-weight: 400;
+    color: #b0bac5;
+
+    display: flex;
+}
+
+.module {
+    display: flex;
+
+    /* border-radius: 1rem; */
+    /* background-color: #26292f; */
+    background-color: #2b2b2b;
+    border-radius: 23px;
+    box-shadow: rgba(0,0,0,0.25) 0px 2px 4px 0px;
+    padding: 1rem;
+}
+
+p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+
+.mod-icon {
+    /* border-radius: 1.25rem; */
+    border-radius: 23px;
+    height: 6rem;
+    width: 6rem;
+    background-color: #434956;
+    object-fit: contain;
+
+    margin-right: .75rem;
+    /* margin-bottom: 0.75rem; */
+    box-shadow: inset 0px -2px 2px rgba(17,24,39,0.1), rgba(0,0,0,0.25) 0px 2px 4px 0px;
+}
+
+.title {
+    margin: 0;
+    padding: 0;
+    color: #ecf9fb;
+    font-size: 1.5rem;
+}
+
+a {
+    text-decoration: none;
+}
+
+h2 {
+    margin-block-start: 0em;
+    margin-block-end: 0em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    row-gap: 20px;
+    padding: 20px;
+    height: 100vh;
+
+    box-sizing: border-box;
+}
+
+main .title-bar {
+    box-shadow: rgba(0,0,0,0.25) 0px 2px 4px 0px;
+    height: auto;
+    display: flex;
+    justify-content: space-between;
+    background-color: #2B2B2B;
+    border-radius: 16px;
+    padding: 12px 21px 12px 21px;
+}
+
+main .title-bar h1 {
+    align-self: center;
+}
+
+h1 {
+    font-size: 32px;
+    font-weight: bold;
+    margin-block: 0;
+    letter-spacing: 1px;
+}
+
+h6 {
+    margin-block: 0;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.mods-list {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    height: calc(100% - 40px);
+
+    row-gap: 10px;
+
+    column-width: 20%;
+
+    overflow-x: scroll;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.mods-list::-webkit-scrollbar {
+    display: none;
+}
+
+.mod {
+    height: 70px;
+    width: calc(50% - 10px);
+    display: flex;
+    justify-content: space-between;
+    border-radius: 10px;
+    box-shadow: rgba(0,0,0,0.25) 0px 2px 4px 0px;
+    background-color: #2B2B2B;
+    padding: 10px;
+    align-items: center;
+    
+    /* position: relative; */
+    box-sizing: border-box;
+}
+
+.mod img {
+    height: 48px;
+    background-color: #434956;
+    border-radius: 10px;
+    margin-right: 10px;
+    box-shadow: rgba(0,0,0,0.25) 0px 2px 4px 0px;
+}
+
+.mod p {
+    font-size: 14px;
+    color: #B5B5B5;
+    margin-right: 15px;
+}
+
+.mod>div {
+    display: flex;
+    align-items: center;
+}
+
+.dot {
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+
+    position: relative;
+    top: -1px;
+}
+
+.status>p {
+    content: '';
+}
+
+.unknown:after {
+    content: 'Inconnu';
+}
+
+.incompatible:after {
+    content: 'Incompatible';
+}
+
+.beta:after {
+    content: 'Bêta disponible';
+}
+
+.update:after {
+    content: 'Mise à jour disponible';
+}
+
+.good:after {
+    content: 'À jour';
+}
+
+.incompatible .dot {
+    background-color: #FF0000;
+}
+
+.unknown .dot {
+    background-color: #AB00FF;
+}
+
+.good .dot {
+    background-color: #1AFF00;
+}
+
+.beta .dot {
+    background-color: #0088FF;
+}
+
+.update .dot {
+    background-color: #FF9900;
+}
+
+#config-menu {
+    height: calc(100% - 40px);
+    width: 30vw;
+    margin: 20px;
+    box-shadow: rgba(0,0,0,0.25) 0px 2px 4px 0px;
+    background-color: #2B2B2B;
+    border-radius: 16px;
+    box-sizing: border-box;
+}
+
+select {
+    width: 50%;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+select::-webkit-scrollbar {
+    display: none;
+}

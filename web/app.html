@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="app.css">
+    <script type="text/javascript" src="../eel.js"></script>
+    <script type="text/javascript" src="app.js" defer></script>
+</head>
+<body>
+
+    <main>
+
+        <div class="title-bar">
+            <div>
+                <h1>Cool Modpack</h1>
+                <h6>.minecraft/cool-modpack/</h6>
+            </div>
+
+            <h1>
+                Fabric 1.19.3
+            </h1>
+        </div>
+            
+        <div class="mods-list" id="mods-list">
+            
+            <div class="mod">
+                <div>
+                    <img src="./assets/icon.webp" alt="Mod Icon" draggable="false">
+                    <h2>Fabric API</h2>
+                </div>
+                <div class="status">
+                    <p class="good">
+                        <span class="dot"></span></p>
+                </div>
+            </div>
+
+            <div class="mod">
+                <div>
+                    <img src="./assets/icon.webp" alt="Mod Icon" draggable="false">
+                    <h2>Fabric API</h2>
+                </div>
+                <div class="status">
+                    <p class="good">
+                        <span class="dot"></span></p>
+                </div>
+            </div>
+
+        </div>
+        
+    
+    </main>
+
+    <aside>
+        <div id="config-menu">
+
+            <h1>Settings</h1>
+
+            <select>
+                <option value="1.19.3">1.19.3</option>
+                <option value="1.19.2">1.19.2</option>
+                <option value="1.19.1">1.19.1</option>
+                <option value="1.19">1.19</option>
+
+                <option value="1.18.2">1.18.2</option>
+                <option value="1.18.1">1.18.1</option>
+                <option value="1.18">1.18</option>
+                <option value="1.17.1">1.17.1</option>
+                <option value="1.17">1.17</option>
+                <option value="1.16.4">1.16.4</option>
+                <option value="1.16.3">1.16.3</option>
+                <option value="1.16.2">1.16.2</option>
+                <option value="1.16.1">1.16.1</option>
+                <option value="1.16">1.16</option>
+                <option value="1.15.2">1.15.2</option>
+                <option value="1.15.1">1.15.1</option>
+                <option value="1.15">1.15</option>
+                <option value="1.14.4">1.14.4</option>
+                <option value="1.14.3">1.14.3</option>
+                <option value="1.14.2">1.14.2</option>
+                <option value="1.14.1">1.14.1</option>
+                <option value="1.14">1.14</option>
+            </select>
+            
+
+            <select name="modloader" id="">
+                <option value="fabric">Fabric</option>
+                <option value="quilt">Quilt</option>
+                <!-- <option value="forge" disabled>Forge</option> -->
+            </select>
+        </div>
+    </aside>
+</body>
+</html>

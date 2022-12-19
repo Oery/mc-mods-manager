@@ -152,6 +152,7 @@ cython_debug/
 #.idea/
 
 mods/
+icons/
 index.json
 modpacks.json
 mods.json
